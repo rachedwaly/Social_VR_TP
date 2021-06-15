@@ -15,7 +15,6 @@ public class Handler : MonoBehaviour
         if (OVRInput.Get(OVRInput.Button.One))
         {
             takeSelfie?.Invoke();
-            onScreenShotTaken?.Invoke();
         }
 
         if (OVRInput.Get(OVRInput.Button.Two))
