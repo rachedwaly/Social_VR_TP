@@ -5,7 +5,7 @@ using UnityEngine;
 public class Demon : MonoBehaviour
 {
     private Animator demonAnimator;
-
+    private bool isDead = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,7 +16,13 @@ public class Demon : MonoBehaviour
     {
         if (other.CompareTag("DemonSlayerSword"))
         {
-            demonAnimator.SetTrigger("Death");
+            if (!isDead)
+            {
+                isDead = true;
+
+                demonAnimator.SetTrigger("Death");
+
+            }
         }
     }
 }
