@@ -8,20 +8,21 @@
 
     public class WebCamDisplay : MonoBehaviour, IWebCamDisplay
     {
-        public Camera selfieCam;
+        public Camera selfieCam, selfieCam2;
 
         private WebCamTexture webCamTexture;
         private bool takeSelfie = false;
-        private Camera virtualCamera;
+        private Camera virtualCamera, virtualCamera2;
         private Transform target;
         private Vector3 screenPos;
-
+        private Rect rect1;
 
         // Start is called before the first frame update
 
         void Awake()
         {
             selfieCam = GameObject.Find("SelfieCamera").GetComponent<Camera>();
+            selfieCam2 = GameObject.Find("SelfieCamera2").GetComponent<Camera>();
             virtualCamera = GameObject.Find("OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/VirtualCamera").GetComponent<Camera>();
             target = GameObject.Find("OVRPlayerController/OVRCameraRig/TrackingSpace/CenterEyeAnchor/head").GetComponent<Transform>();
 
@@ -41,6 +42,7 @@
 
             this.GetComponent<MeshRenderer>().material.mainTexture = webCamTexture;
             webCamTexture.Play();
+            
         }
 
 
@@ -52,6 +54,8 @@
 
 
                 selfieCam.CopyFrom(virtualCamera);
+                selfieCam2.CopyFrom(virtualCamera2);
+
 
                 var currentRT = RenderTexture.active;
                 RenderTexture.active = selfieCam.targetTexture;
@@ -59,10 +63,29 @@
                 // Render the camera's view.
                 selfieCam.Render();
 
+
                 // Make a new texture and read the active Render Texture into it.
                 Texture2D image = new Texture2D(selfieCam.targetTexture.width, selfieCam.targetTexture.height);
                 image.ReadPixels(new UnityEngine.Rect(0, 0, selfieCam.targetTexture.width, selfieCam.targetTexture.height), 0, 0);
                 image.Apply();
+
+           
+                // Replace the original active Render Texture.
+                RenderTexture.active = currentRT;
+
+                currentRT = RenderTexture.active;
+                RenderTexture.active = selfieCam2.targetTexture;
+
+                // Render the camera's view.
+                selfieCam2.Render();
+
+
+                // Make a new texture and read the active Render Texture into it.
+                Texture2D image2 = new Texture2D(selfieCam2.targetTexture.width, selfieCam2.targetTexture.height);
+                image2.ReadPixels(new UnityEngine.Rect(0, 0, selfieCam2.targetTexture.width, selfieCam2.targetTexture.height), 0, 0);
+                image2.Apply();
+
+         
 
                 // Replace the original active Render Texture.
                 RenderTexture.active = currentRT;
@@ -82,11 +105,15 @@
                 screenPos.y = selfieCam.pixelHeight - screenPos.y;
 
                 Mat test = Unity.TextureToMat(texture2D);
-                Cv2.Circle(test, new Point(screenPos.x, screenPos.y), 5, new Scalar(255,0,0));
+                Cv2.Circle(test, new Point(screenPos.x + 50, screenPos.y), 5, new Scalar(255,0,0));
+
+                //Cv2.Rectangle(test, new Rect((int)screenPos.x, (int)screenPos.y, -150, -150), new Scalar(255, 0, 0));
+                rect1 = new Rect((int)(test.Width * 0.20), (int)(test.Height * 0.20), (int)(test.Width * 0.6), (int)(test.Height * 0.79));
+                Cv2.Rectangle(test, new Rect((int)(test.Width * 0.20), (int)(test.Height * 0.20), (int)(test.Width * 0.6), (int)(test.Height * 0.79)), new Scalar(255, 0, 0));
                 texture2D = Unity.MatToTexture(test);
 
                 Mat test1 = Unity.TextureToMat(image) ;
-                Cv2.Circle(test1, new Point(screenPos.x, screenPos.y), 5, new Scalar(255,0,0));
+                Cv2.Circle(test1, new Point((int)(screenPos.x-(test1.Width*1.0)/4.0),(int)( screenPos.y - (test1.Height * 1.0) / 4.0)), 5, new Scalar(255,0,0));
                 image = Unity.MatToTexture(test1);
 
 
@@ -98,7 +125,11 @@
                 System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/VSelfieIRL.png", byteArray2);
                 AssetDatabase.Refresh();
 
-                Debug.Log("zall");
+                byte[] byteArray3 = image2.EncodeToPNG();
+                System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/VSelfieIRLBG.png", byteArray3);
+                AssetDatabase.Refresh();
+
+                
             }
         }
 
@@ -144,10 +175,11 @@
             int w = (int)(real_matc.Width * (2.0 / 5.0));
             int h = (int)(real_matc.Height *(2.0 / 5.0));
 
-            Rect rect = new Rect((int)(real_matc.Width * (1.0 / 4.0)), (int)(real_matc.Height * (1.0 / 4.0)),(int)(real_matc.Width * (1.0 / 2.0)) , (int)(real_matc.Height * (1.0 / 2.0)));
+            //Rect rect = new Rect((int)(real_matc.Width * (1.0 / 4.0)), (int)(real_matc.Height * (1.0 / 4.0)),(int)(real_matc.Width * (1.0 / 2.0)) , (int)(real_matc.Height * (1.0 / 2.0)));
+            Rect rect = new Rect((int)screenPos.x, (int)screenPos.y, -150, -150);
             //Rect rect = new Rect((int)rectangle.p1.x, (int)rectangle.p1.y, (int)rectangle.GetWidth(), (int)rectangle.GetHeight());
             
-            Cv2.GrabCut(virtual_matc, result, rect, new Mat(), new Mat(), 3, GrabCutModes.InitWithRect);
+            Cv2.GrabCut(virtual_matc, result, rect1, new Mat(), new Mat(), 3, GrabCutModes.InitWithRect);
             Mat mask1 = ((result & 1)) * 255;
             Mat mask2 = new Mat(mask1.Size(), MatType.CV_8UC1); ;
             mask2 = 255 - mask1;
