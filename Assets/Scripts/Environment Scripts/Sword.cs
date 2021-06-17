@@ -18,6 +18,7 @@ public class Sword : MonoBehaviour
             pushParticles.gameObject.SetActive(true);
             this.gameObject.transform.SetParent(other.transform);
             transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            transform.localPosition = Vector3.zero;
             gameObject.transform.rotation = other.transform.rotation;
             leftControllerRenderer.enabled = false;
         }

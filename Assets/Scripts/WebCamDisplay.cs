@@ -81,6 +81,14 @@
                 screenPos = selfieCam.WorldToScreenPoint(target.position);
                 screenPos.y = selfieCam.pixelHeight - screenPos.y;
 
+                Mat test = Unity.TextureToMat(texture2D);
+                Cv2.Circle(test, new Point(screenPos.x, screenPos.y), 5, new Scalar(255,0,0));
+                texture2D = Unity.MatToTexture(test);
+
+                Mat test1 = Unity.TextureToMat(image) ;
+                Cv2.Circle(test1, new Point(screenPos.x, screenPos.y), 5, new Scalar(255,0,0));
+                image = Unity.MatToTexture(test1);
+
 
                 byte[] byteArray = texture2D.EncodeToPNG();
                 System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/SelfieIRL.png", byteArray);
