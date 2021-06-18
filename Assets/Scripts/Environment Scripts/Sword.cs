@@ -5,7 +5,6 @@ using UnityEngine;
 public class Sword : MonoBehaviour
 {
     public TriggerAnimations animationTrigger;
-    public SkinnedMeshRenderer leftControllerRenderer;
     public GameObject pullParticles;
     public GameObject pushParticles;
 
@@ -20,7 +19,11 @@ public class Sword : MonoBehaviour
             transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
             transform.localPosition = Vector3.zero;
             gameObject.transform.rotation = other.transform.rotation;
-            leftControllerRenderer.enabled = false;
+
+        }
+        else if (other.CompareTag("Demon"))
+        {
+            Destroy(gameObject);
         }
     }
 }

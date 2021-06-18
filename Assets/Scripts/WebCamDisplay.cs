@@ -22,9 +22,9 @@
         void Awake()
         {
             selfieCam = GameObject.Find("SelfieCamera").GetComponent<Camera>();
-            selfieCam2 = GameObject.Find("SelfieCamera2").GetComponent<Camera>();
             virtualCamera = GameObject.Find("OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/VirtualCamera").GetComponent<Camera>();
             target = GameObject.Find("OVRPlayerController/OVRCameraRig/TrackingSpace/CenterEyeAnchor/head").GetComponent<Transform>();
+            selfieCam2 = GameObject.Find("OVRPlayerController/OVRCameraRig/TrackingSpace/RightHandAnchor/VirtualCamera2").GetComponent<Camera>();
 
             //MouseSelector.onPointsSelected += removeUser;
             Handler.takeSelfie += takeIRLSelfie;

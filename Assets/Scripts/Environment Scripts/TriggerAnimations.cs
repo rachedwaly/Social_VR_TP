@@ -34,7 +34,7 @@ public class TriggerAnimations : MonoBehaviour
 
             demonAnimator.SetTrigger("Punching");
 
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(0.5f);
 
             golemAnimator.SetTrigger("Death");
         }
