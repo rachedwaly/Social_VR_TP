@@ -8,6 +8,8 @@ TagManager:
   - Left Controller
   - Grabbable
   - Demon
+  - Left Cannon
+  - Right Cannon
   layers:
   - Default
   - TransparentFX

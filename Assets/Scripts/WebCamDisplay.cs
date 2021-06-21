@@ -5,6 +5,7 @@
     using UnityEngine;
     using OpenCvSharp;
     using UnityEditor;
+    using System;
 
     public class WebCamDisplay : MonoBehaviour, IWebCamDisplay
     {
@@ -17,6 +18,8 @@
         private Vector3 screenPos;
         private Rect rect1;
         private Rect rect2;
+
+        public static Action onResultReceived;
 
         // Start is called before the first frame update
 
@@ -184,7 +187,7 @@
 
             
 
-            Cv2.GrabCut(real_matc, result_mask_real, rect1, new Mat(), new Mat(), 3, GrabCutModes.InitWithRect);
+            Cv2.GrabCut(real_matc, result_mask_real, rect2, new Mat(), new Mat(), 3, GrabCutModes.InitWithRect);
 
             Mat mask1_real = ((result_mask_real & 1)) * 255;
             Mat mask2_real = new Mat(mask1.Size(), MatType.CV_8UC1); ;
@@ -217,7 +220,8 @@
             System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/result.png", byteArray5);
             AssetDatabase.Refresh();
 
-      
+
+            onResultReceived();
 
         }
 

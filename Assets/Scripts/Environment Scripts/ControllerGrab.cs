@@ -11,7 +11,7 @@ public class ControllerGrab : MonoBehaviour
             if(OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger) > 0.8f)
             {
                 other.transform.position = transform.position;
-                other.transform.rotation = transform.rotation;
+                //other.transform.rotation = transform.rotation;
             }
 
             if (OVRInput.GetDown(OVRInput.Button.Four))
