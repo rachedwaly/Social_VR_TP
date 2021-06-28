@@ -11,11 +11,18 @@
     {
         //public Camera selfieCam, selfieCam2;
 
+        private float v1;
+        private float v2;
+        private float v3;
+        private float v4;
+        private float threshX;
+        private float threshY;
+
         private WebCamTexture webCamTexture;
         private bool takeSelfie = false;
         private Camera virtualCamera, virtualCamera2, selfieCam, selfieCam2;
         private Transform target;
-        private Vector3 screenPos;
+        private Vector3 screenPos, screenPosCenter;
         private Rect rect1;
         private Rect rect2;
 
@@ -33,7 +40,18 @@
             //MouseSelector.onPointsSelected += removeUser;
             Handler.takeSelfie += takeIRLSelfie;
             Handler.removeUser += removeUser;
-        }
+
+            screenPosCenter = new Vector3((float)329.72, (float)335.55, (float)614.30);
+
+            v1 = 0.15f;
+            v2 = 0.35f;
+            v3 = 0.33f;
+            v4 = 0.33f;
+            threshX = 0.5f;
+            threshY = 0.5f;
+
+
+    }
 
         void Start()
         {
@@ -105,23 +123,67 @@
                 screenPos = selfieCam.WorldToScreenPoint(target.position);
                 screenPos.y = selfieCam.pixelHeight - screenPos.y;
 
+                Vector3 YO = screenPos - screenPosCenter;
+
                 Mat test = Unity.TextureToMat(texture2D);
-                Cv2.Circle(test, new Point(screenPos.x + 50, screenPos.y), 5, new Scalar(255,0,0));
+
+                int x = (int) (test.Width/2 + YO.x);
+                int y = (int) (test.Height/2 + YO.y);
+                int w = test.Width;
+                int h = test.Height;
+
+                //Cv2.Circle(test, new Point(x, y), 5, new Scalar(255,0,0));
 
                 rect1 = new Rect((int)(test.Width * 0.20), (int)(test.Height * 0.05), (int)(test.Width * 0.6), (int)(test.Height * 0.95));
                 rect2 = new Rect((int)(test.Width * 0.20), (int)(test.Height *0.3), (int)(test.Width * 0.6), (int)(test.Height * 0.68));
-                //Cv2.Rectangle(test, rect1, new Scalar(255, 0, 0));
+
+                
+                if (((float)x) < w * threshX)
+                {
+                    v2 = (float)0.05;
+                    v4 = (float)0.8;
+                }
+                else
+                {
+                    v2 = (float)0.2;
+                    v4 = (float)0.98;
+                }
+                if (((float)y) < h * threshY)
+                {
+                    v1 = (float)0.05;
+                    v3 = (float)0.8;
+                }
+                else
+                {
+                    v1 = (float)0.2;
+                    v3 = (float)0.98;
+                }
+               
+
+                
+    
+
+                int x1 = (int)(v2 * w);
+                int y1 = (int)(v1 * h);
+
+                int height1 = (int)( (v3-v1)*h);
+                int widht1 = (int)((v4 - v2) * w); ;
+
+                rect1 = new Rect(x1, y1, widht1, height1);
+
+                
+                Mat test1 = Unity.TextureToMat(image);
+
+                
+                //Cv2.Circle(test1, new Point(6, 6), 5, new Scalar(0, 255, 0));
+                //Cv2.Circle(test1, new Point(test.Width-6, test.Height-6), 5, new Scalar(0, 0, 255));
+
                 texture2D = Unity.MatToTexture(test);
-
-                Mat test1 = Unity.TextureToMat(image) ;
-                Cv2.Circle(test1, new Point((int)(screenPos.x-(test1.Width*1.0)/4.0),(int)( screenPos.y - (test1.Height * 1.0) / 4.0)), 5, new Scalar(255,0,0));
-                image = Unity.MatToTexture(test1);
-
-
                 byte[] byteArray = texture2D.EncodeToPNG();
                 System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/SelfieIRL.png", byteArray);
                 AssetDatabase.Refresh();
-
+                
+                image = Unity.MatToTexture(test1);
                 byte[] byteArray2 = image.EncodeToPNG();
                 System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/VSelfieIRL.png", byteArray2);
                 AssetDatabase.Refresh();
@@ -220,12 +282,13 @@
             System.IO.File.WriteAllBytes(Application.dataPath + "/Resources/result.png", byteArray5);
             AssetDatabase.Refresh();
 
+           
 
             onResultReceived();
 
         }
 
-
+ 
 
         private Texture2D LoadPNG(string filePath)
         {

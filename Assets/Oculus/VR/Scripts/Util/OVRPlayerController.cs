@@ -19,6 +19,9 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class OVRPlayerController : MonoBehaviour
 {
+	public GameObject rightCannon;
+	public GameObject leftCannon;
+
 	/// <summary>
 	/// The rate acceleration during movement.
 	/// </summary>
@@ -449,6 +452,8 @@ public class OVRPlayerController : MonoBehaviour
 					if (ReadyToSnapTurn)
 					{
 						euler.y -= RotationRatchet;
+						rightCannon.transform.rotation = Quaternion.Euler(euler.x, euler.y - RotationRatchet, euler.z);
+						leftCannon.transform.rotation = Quaternion.Euler(euler.x, euler.y - RotationRatchet, euler.z);
 						ReadyToSnapTurn = false;
 					}
 				}
@@ -458,6 +463,8 @@ public class OVRPlayerController : MonoBehaviour
 					if (ReadyToSnapTurn)
 					{
 						euler.y += RotationRatchet;
+						rightCannon.transform.rotation = Quaternion.Euler(euler.x, euler.y + RotationRatchet, euler.z);
+						leftCannon.transform.rotation = Quaternion.Euler(euler.x, euler.y + RotationRatchet, euler.z);
 						ReadyToSnapTurn = false;
 					}
 				}
